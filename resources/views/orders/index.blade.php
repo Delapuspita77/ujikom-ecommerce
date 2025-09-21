@@ -3,65 +3,64 @@
 @section('title', 'My Orders - Ecommerce Healthcare')
 
 @section('content')
-    <h1 style="margin-bottom: 1.5rem; font-weight: 700; font-size: 2rem; color: #2c3e50;">
-        My Orders
-    </h1>
+    <h1 class="mb-6 text-2xl font-bold text-gray-800">My Orders</h1>
 
     @if(session('success'))
-        <div style="background:#d4edda; color:#155724; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+        <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
             {{ session('success') }}
         </div>
     @endif
 
-    @if($orders->isEmpty())     
+    @if($orders->isEmpty())
         <p>You don’t have any orders yet.</p>
     @else
-        <table style="width:100%; border-collapse: collapse; margin-top:1rem;">
+        <table class="w-full border-collapse">
             <thead>
-                <tr style="background:#f8f9fa; text-align:left;">
-                    <th style="padding:0.75rem; border-bottom:1px solid #ddd;">Order ID</th>
-                    <th style="padding:0.75rem; border-bottom:1px solid #ddd;">Total</th>
-                    <th style="padding:0.75rem; border-bottom:1px solid #ddd;">Status</th>
-                    <th style="padding:0.75rem; border-bottom:1px solid #ddd;">Payment</th>
-                    <th style="padding:0.75rem; border-bottom:1px solid #ddd;">Action</th>
+                <tr class="bg-gray-100 text-left">
+                    <th class="p-2 border">Order ID</th>
+                    <th class="p-2 border">Total</th>
+                    <th class="p-2 border">Order Status</th>
+                    <th class="p-2 border">Payment Status</th>
+                    <th class="p-2 border">Payment Method</th>
+                    <th class="p-2 border">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($orders as $order)
-                    <tr>
-                        <td style="padding:0.75rem; border-bottom:1px solid #ddd;">
-                            #{{ $order->id }}
-                        </td>
-                        <td style="padding:0.75rem; border-bottom:1px solid #ddd;">
-                            Rp {{ number_format($order->total, 0, ',', '.') }}
-                        </td>
-                        <td style="padding:0.75rem; border-bottom:1px solid #ddd;">
-                            {{ ucfirst($order->status) }}
-                        </td>
-                        <td style="padding:0.75rem; border-bottom:1px solid #ddd;">
-                            {{ $order->payment ? ucfirst(str_replace('_',' ', $order->payment->method)) : '-' }}
-                        </td>
-                        <td style="padding:0.75rem; border-bottom:1px solid #ddd;">
-                            <!-- Tombol Confirm Payment kalau masih pending -->
-                            @if($order->status === 'pending')
-                                <form action="{{ route('orders.confirm', $order->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    <button type="submit" 
-                                        style="margin-left: 0.5rem; background: #28a745; color:white; border:none; padding:0.25rem 0.75rem; border-radius:4px; cursor:pointer;">
-                                        Confirm
-                                    </button>
-                                </form>
-                            @endif
-                            <!-- Tombol View selalu tampil -->
-                            <a href="{{ route('orders.show', $order->id) }}" 
-                            style="background:#007bff; color:white; padding:0.5rem 1rem; border-radius:4px; text-decoration:none; margin-left:0.5rem;">
-                                View
-                            </a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td class="p-2 border">#{{ $order->id }}</td>
+                    <td class="p-2 border">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                    <td class="p-2 border">{{ ucfirst($order->status_order) }}</td>
+                    <td class="p-2 border">{{ ucfirst(str_replace('_',' ', $order->status)) }}</td>
+                    <td class="p-2 border">{{ $order->payment ? ucfirst(str_replace('_',' ', $order->payment->method)) : '-' }}</td>
+                    <td class="p-2 border">
+                        {{-- Tombol Cancel & Confirm hanya kalau order masih pending --}}
+                        @if($order->status_order === 'pending')
+                            <form action="{{ route('orders.cancel', $order->id) }}" method="POST" 
+                                  onsubmit="return confirm('Cancel this order?')" class="inline">
+                                @csrf
+                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">
+                                    Cancel
+                                </button>
+                            </form>
+
+                            <form action="{{ route('orders.confirm', $order->id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded">
+                                    Confirm
+                                </button>
+                            </form>
+                        @endif
+
+                        {{-- Selalu ada tombol view --}}
+                        <a href="{{ route('orders.show', $order->id) }}" 
+                           class="bg-blue-500 text-white px-2 py-1 rounded ml-1">
+                            View
+                        </a>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
-
         </table>
     @endif
 @endsection

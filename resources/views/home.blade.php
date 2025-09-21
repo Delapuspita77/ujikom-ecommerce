@@ -18,18 +18,17 @@
     </div>
 
     <!-- Categories Section -->
-    <h2 style="font-size:1.8rem; font-weight:700; margin-bottom:1.5rem; color:#2c3e50;">Shop by Categories</h2>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1.5rem; margin-bottom:3rem;">
-        <div style="background:#f8f9fa; border-radius:8px; padding:2rem; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
-            <h3>Vitamins</h3>
-        </div>
-        <div style="background:#f8f9fa; border-radius:8px; padding:2rem; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
-            <h3>Medicines</h3>
-        </div>
-        <div style="background:#f8f9fa; border-radius:8px; padding:2rem; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
-            <h3>Medical Devices</h3>
-        </div>
-    </div>
+    <h2 class="text-lg font-bold mb-4">Categories</h2>
+    <ul>
+        @foreach($categories as $category)
+            <li>
+                <a href="{{ route('products.index', ['category' => $category->id]) }}">
+                    {{ $category->name }}
+                </a>
+            </li>
+        @endforeach
+    </ul>
+
 
     <!-- Featured Products -->
     <h2 style="font-size:1.8rem; font-weight:700; margin-bottom:1.5rem; color:#2c3e50;">Featured Products</h2>

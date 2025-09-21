@@ -25,12 +25,13 @@ class CheckoutController extends Controller
 
         // Simpan Order
         $order = Order::create([
-            'user_id' => auth()->id(),
-            'address' => $request->address,
-            'status'  => 'pending', // 🔥 semua default pending
-            'total'   => $total,
-            'payment_method' => $request->payment_method,
+            'user_id'      => auth()->id(),
+            'address'      => $request->address,
+            'total'        => $total,
+            'status'       => 'unpaid',   // default untuk payment
+            'status_order' => 'pending',  // default untuk order
         ]);
+
 
         // ✅ Simpan Payment juga
         Payment::create([

@@ -24,8 +24,12 @@
                     <td class="border px-3 py-2">{{ $user->email }}</td>
                     <td class="border px-3 py-2">{{ $user->role ?? 'user' }}</td>
                     <td class="border px-3 py-2">
-                        <a href="#" class="text-blue-600">Edit</a> |
-                        <a href="#" class="text-red-600">Delete</a>
+                        <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600">Edit</a> |
+                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600" onclick="return confirm('Are you sure?')">Delete</button>
+                        </form>
                     </td>
                 </tr>
             @empty

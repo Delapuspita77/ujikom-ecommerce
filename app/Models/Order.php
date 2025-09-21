@@ -6,8 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['user_id', 'address', 'total', 'status'];
+    protected $fillable = ['user_id', 'address', 'total', 'status', 'status_order'];
 
+    protected $attributes = [
+        'status_order' => 'pending',
+        'status'       => 'unpaid',
+    ];
+    
     // Relasi ke user
     public function user()
     {

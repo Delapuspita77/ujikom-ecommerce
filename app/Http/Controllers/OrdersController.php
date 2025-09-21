@@ -24,14 +24,36 @@ class OrdersController extends Controller
         return view('orders.show', compact('order'));
     }
 
+    public function cancel($id)
+    {
+        $order = Order::where('user_id', auth()->id())->findOrFail($id);
+
+        if ($order->status_order === 'pending') {
+            $order->update([
+                'status_order' => 'cancelled',
+                'status'       => 'cancelled',
+            ]);
+            return redirect()->route('orders.index')->with('success', 'Order has been cancelled.');
+        }
+
+        return back()->with('error', 'This order cannot be cancelled.');
+    }
+
     public function confirm($id)
     {
-    $order = Order::where('user_id', auth()->id())->findOrFail($id);
+        $order = Order::where('user_id', auth()->id())->findOrFail($id);
 
-    // Update status jadi paid
-    $order->update(['status' => 'paid']);
+        if ($order->status_order === 'pending') {
+            $order->update([
+                'status_order' => 'paid',
+                'status'       => 'waiting_verification',
+            ]);
+            return redirect()->route('orders.index')->with('success', 'Payment confirmation submitted. Waiting for admin verification.');
+        }
 
-    return redirect()->route('orders.index')->with('success', 'Payment confirmed successfully!');
+        return back()->with('error', 'This order cannot be confirmed.');
     }
+
+
 
 }

@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{id}', [OrdersController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/confirm', [OrdersController::class, 'confirm'])->name('orders.confirm');
 });
+Route::post('/orders/{id}/cancel', [OrdersController::class, 'cancel'])->name('orders.cancel');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
@@ -60,7 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment/{order}', [PaymentController::class, 'pay'])->name('payment.pay');
     Route::get('/invoice/{order_id}', [InvoiceController::class, 'show'])->name('invoice.show');
 });
-    Route::get('/orders/{id}/invoice', [App\Http\Controllers\Controller::class, 'invoice'])
+    Route::get('/orders/{id}/invoice', [InvoiceController::class, 'invoice'])
     ->name('orders.invoice');
 
 Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
@@ -71,6 +72,12 @@ Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/orders', AdminOrderController::class)->names('admin.orders');
     Route::resource('/categories', AdminCategoryController::class)->names('admin.categories');
     Route::resource('/feedbacks', AdminFeedbackController::class)->names('admin.feedbacks');
+
+    Route::post('/orders/{order}/accept', [AdminOrderController::class, 'accept'])->name('admin.orders.accept');
+    Route::post('/orders/{order}/reject', [AdminOrderController::class, 'reject'])->name('admin.orders.reject');
+    Route::post('/admin/orders/{id}/ship', [AdminOrderController::class, 'ship'])->name('admin.orders.ship');
+
 });
+
 
 

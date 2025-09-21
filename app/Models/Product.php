@@ -18,17 +18,18 @@ class Product extends Model
         'description',
         'price',
         'image',
-        'categories_id',
+        'category_id',
         // tambahkan kolom lain sesuai kebutuhan
     ];
 
     /**
      * Relasi ke kategori produk
      */
-    public function categories()
+    public function category()
     {
-        return $this->belongsTo(Categories::class);
+    return $this->belongsTo(Categories::class, 'category_id');
     }
+
 
     /**
      * Relasi ke item keranjang (cart)

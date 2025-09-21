@@ -23,4 +23,48 @@ class OrderController extends Controller
         $order->update(['status' => request('status')]);
         return redirect()->route('admin.orders.index')->with('success', 'Order status updated!');
     }
+
+    public function accept($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status_order === 'paid') {
+            $order->update([
+                'status_order' => 'processed',
+                'status'       => 'verified',
+            ]);
+            return back()->with('success', 'Order accepted and payment verified.');
+        }
+
+        return back()->with('error', 'Only paid orders can be accepted.');
+    }
+
+    public function reject($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status_order === 'paid') {
+            $order->update([
+                'status_order' => 'rejected',
+                'status'       => 'failed',
+            ]);
+            return back()->with('success', 'Order has been rejected.');
+        }
+
+        return back()->with('error', 'Only paid orders can be rejected.');
+    }
+
+    public function ship($id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status_order === 'processed') {
+            $order->update([
+                'status_order' => 'shipped',
+            ]);
+        }
+
+        return redirect()->route('admin.orders.index')->with('success', 'Order has been shipped!');
+    }
+
 }

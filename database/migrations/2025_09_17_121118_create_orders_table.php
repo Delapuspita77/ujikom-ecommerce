@@ -12,7 +12,15 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('address');
             $table->decimal('total', 12, 2);
-            $table->enum('status', ['pending', 'paid', 'shipped', 'completed', 'cancelled'])->default('pending');
+
+            // status untuk pembayaran
+            $table->enum('status', ['unpaid', 'waiting_verification', 'processed', 'failed', 'cancelled'])
+                  ->default('unpaid');
+
+            // status order (alur pemesanan)
+            $table->enum('status_order', ['pending', 'paid', 'verified',  'rejected', 'cancelled'])
+                  ->default('pending');
+
             $table->timestamps();
         });
     }
@@ -22,3 +30,4 @@ return new class extends Migration {
         Schema::dropIfExists('orders');
     }
 };
+
