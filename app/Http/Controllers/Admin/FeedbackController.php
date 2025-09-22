@@ -9,7 +9,7 @@ class FeedbackController extends Controller
 {
     public function index()
     {
-        $feedbacks = Feedbacks::with('user')->latest()->get();
+        $feedbacks = Feedbacks::with(['user', 'product'])->latest()->get();
         return view('admin.feedbacks.index', compact('feedbacks'));
     }
 

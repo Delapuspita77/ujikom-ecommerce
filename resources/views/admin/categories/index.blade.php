@@ -3,38 +3,50 @@
 @section('title', 'Manage Categories')
 
 @section('content')
-<div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Categories</h1>
+<div class="bg-white p-6 rounded-lg shadow">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">Categories</h1>
 
-    <a href="{{ route('admin.categories.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded">+ Add Category</a>
+    <a href="{{ route('admin.categories.create') }}" 
+       class="inline-block px-4 py-2 mb-4 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition">
+        + Add Category
+    </a>
 
-    <table class="w-full mt-6 border border-gray-300">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="border px-3 py-2">ID</th>
-                <th class="border px-3 py-2">Name</th>
-                <th class="border px-3 py-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($categories as $category)
-                <tr>
-                    <td class="border px-3 py-2">{{ $category->id }}</td>
-                    <td class="border px-3 py-2">{{ $category->name }}</td>
-                    <td class="border px-3 py-2">
-                        <a href="{{ route('admin.categories.edit', $category->id) }}" class="text-blue-600">Edit</a> |
-                        <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" class="inline">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="text-red-600">Delete</button>
-                        </form>
-                    </td>
+    <div class="overflow-x-auto">
+        <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
+            <thead>
+                <tr class="bg-gray-50 text-left text-gray-700">
+                    <th class="p-3 border">ID</th>
+                    <th class="p-3 border">Name</th>
+                    <th class="p-3 border">Actions</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="3" class="border px-3 py-2 text-center">No categories found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @forelse($categories as $category)
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-3 border font-medium text-gray-800">{{ $category->id }}</td>
+                        <td class="p-3 border">{{ $category->name }}</td>
+                        <td class="p-3 border space-x-2">
+                            <a href="{{ route('admin.categories.edit', $category->id) }}" 
+                               class="text-blue-600 hover:underline font-medium">Edit</a>
+                            <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" class="inline">
+                                @csrf @method('DELETE')
+                                <button type="submit" 
+                                    onclick="return confirm('Are you sure?')"
+                                    class="text-red-600 hover:underline font-medium">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="p-3 border text-center text-gray-500 italic">
+                            No categories found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

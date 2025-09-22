@@ -12,55 +12,67 @@
     @endif
 
     @if($orders->isEmpty())
-        <p>You don’t have any orders yet.</p>
+        <p class="text-gray-600">You don’t have any orders yet.</p>
     @else
-        <table class="w-full border-collapse">
-            <thead>
-                <tr class="bg-gray-100 text-left">
-                    <th class="p-2 border">Order ID</th>
-                    <th class="p-2 border">Total</th>
-                    <th class="p-2 border">Order Status</th>
-                    <th class="p-2 border">Payment Status</th>
-                    <th class="p-2 border">Payment Method</th>
-                    <th class="p-2 border">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($orders as $order)
-                <tr>
-                    <td class="p-2 border">#{{ $order->id }}</td>
-                    <td class="p-2 border">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
-                    <td class="p-2 border">{{ ucfirst($order->status_order) }}</td>
-                    <td class="p-2 border">{{ ucfirst(str_replace('_',' ', $order->status)) }}</td>
-                    <td class="p-2 border">{{ $order->payment ? ucfirst(str_replace('_',' ', $order->payment->method)) : '-' }}</td>
-                    <td class="p-2 border">
-                        {{-- Tombol Cancel & Confirm hanya kalau order masih pending --}}
-                        @if($order->status_order === 'pending')
-                            <form action="{{ route('orders.cancel', $order->id) }}" method="POST" 
-                                  onsubmit="return confirm('Cancel this order?')" class="inline">
-                                @csrf
-                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">
-                                    Cancel
-                                </button>
-                            </form>
+        <div class="overflow-x-auto bg-white rounded-xl shadow">
+            <table class="w-full border-collapse text-sm">
+                <thead>
+                    <tr class="bg-gray-100 text-left text-gray-700">
+                        <th class="p-3 border">Order ID</th>
+                        <th class="p-3 border">Total</th>
+                        <th class="p-3 border">Order Status</th>
+                        <th class="p-3 border">Payment Status</th>
+                        <th class="p-3 border">Payment Method</th>
+                        <th class="p-3 border text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @foreach($orders as $order)
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-3">#{{ $order->id }}</td>
+                            <td class="p-3 font-semibold text-teal-600">
+                                Rp {{ number_format($order->total, 0, ',', '.') }}
+                            </td>
+                            <td class="p-3">
+                                <span class="px-2 py-1 rounded text-xs font-medium 
+                                    {{ $order->status_order === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
+                                       ($order->status_order === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700') }}">
+                                    {{ ucfirst($order->status_order) }}
+                                </span>
+                            </td>
+                            <td class="p-3">{{ ucfirst(str_replace('_',' ', $order->status)) }}</td>
+                            <td class="p-3">{{ $order->payment ? ucfirst(str_replace('_',' ', $order->payment->method)) : '-' }}</td>
+                            <td class="p-3 text-center space-x-2">
+                                {{-- Cancel & Confirm kalau pending --}}
+                                @if($order->status_order === 'pending')
+                                    <form action="{{ route('orders.cancel', $order->id) }}" method="POST" 
+                                          onsubmit="return confirm('Cancel this order?')" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
+                                            Cancel
+                                        </button>
+                                    </form>
 
-                            <form action="{{ route('orders.confirm', $order->id) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded">
-                                    Confirm
-                                </button>
-                            </form>
-                        @endif
+                                    <form action="{{ route('orders.confirm', $order->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                            class="bg-teal-600 hover:bg-teal-500 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
+                                            Confirm
+                                        </button>
+                                    </form>
+                                @endif
 
-                        {{-- Selalu ada tombol view --}}
-                        <a href="{{ route('orders.show', $order->id) }}" 
-                           class="bg-blue-500 text-white px-2 py-1 rounded ml-1">
-                            View
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                                {{-- View selalu ada --}}
+                                <a href="{{ route('orders.show', $order->id) }}" 
+                                   class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 @endsection

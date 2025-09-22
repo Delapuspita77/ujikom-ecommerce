@@ -15,9 +15,11 @@ class InvoiceController extends Controller
 
     public function invoice($id)
     {
-        $order = Order::with('products', 'user')->findOrFail($id);
+        $order = Order::with(['user', 'items.product'])->findOrFail($id);
 
         $pdf = Pdf::loadView('orders.invoice', compact('order'))->setPaper('a4');
         return $pdf->stream("invoice_order_{$order->id}.pdf");
     }
+
+
 }

@@ -6,29 +6,40 @@
 <div class="p-6">
     <h1 class="text-2xl font-bold mb-4">Feedbacks</h1>
 
-    <table class="w-full border border-gray-300">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="border px-3 py-2">ID</th>
-                <th class="border px-3 py-2">User</th>
-                <th class="border px-3 py-2">Message</th>
-                <th class="border px-3 py-2">Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($feedbacks as $feedback)
+    @if($feedbacks->isEmpty())
+        <p>No feedback found.</p>
+    @else
+        <table class="w-full border border-gray-300">
+            <thead class="bg-gray-100">
                 <tr>
-                    <td class="border px-3 py-2">{{ $feedback->id }}</td>
-                    <td class="border px-3 py-2">{{ $feedback->user->name }}</td>
-                    <td class="border px-3 py-2">{{ $feedback->message }}</td>
-                    <td class="border px-3 py-2">{{ $feedback->created_at->format('d M Y') }}</td>
+                    <th class="border px-3 py-2">User</th>
+                    <th class="border px-3 py-2">Product</th>
+                    <th class="border px-3 py-2">Rating</th>
+                    <th class="border px-3 py-2">Comment</th>
+                    <th class="border px-3 py-2">Created</th>
+                    <th class="border px-3 py-2">Actions</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="4" class="border px-3 py-2 text-center">No feedback found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach($feedbacks as $feedback)
+                    <tr>
+                        <td class="border px-3 py-2">{{ $feedback->user->name ?? '-' }}</td>
+                        <td class="border px-3 py-2">{{ $feedback->product->name ?? '-' }}</td>
+                        <td class="border px-3 py-2">{{ $feedback->rating }} / 5</td>
+                        <td class="border px-3 py-2">{{ $feedback->comment }}</td>
+                        <td class="border px-3 py-2">{{ $feedback->created_at->format('d M Y H:i') }}</td>
+                        <td class="border px-3 py-2">
+                            <form action="{{ route('admin.feedbacks.destroy', $feedback->id) }}" 
+                                  method="POST" onsubmit="return confirm('Delete feedback?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 </div>
 @endsection

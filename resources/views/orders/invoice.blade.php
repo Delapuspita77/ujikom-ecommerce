@@ -1,46 +1,96 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice #{{ $order->id }}</title>
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .info {
+            margin-bottom: 20px;
+        }
+        .info p {
+            margin: 2px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background: #f2f2f2;
+        }
+        .total {
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Invoice</h1>
+        <p><strong>Ecommerce Healthcare</strong></p>
+        <p>Jl. Sehat No. 123, Surabaya</p>
+    </div>
 
-@section('title', 'Invoice - Ecommerce Healthcare')
+    <!-- Order Info -->
+    <div class="info">
+        <p><strong>Invoice ID:</strong> #{{ $order->id }}</p>
+        <p><strong>Customer:</strong> {{ $order->user->name }}</p>
+        <p><strong>Address:</strong> {{ $order->address }}</p>
+        <p><strong>Order Status:</strong> {{ ucfirst($order->status_order) }}</p>
+        <p><strong>Payment Status:</strong> {{ ucfirst(str_replace('_',' ', $order->status)) }}</p>
+        <p><strong>Date:</strong> {{ $order->created_at->format('d M Y, H:i') }}</p>
+    </div>
 
-@section('content')
-    <h1 style="text-align:center; margin-bottom:1.5rem;">Invoice</h1>
-
-    <p><strong>Order ID:</strong> #{{ $order->id }}</p>
-    <p><strong>Customer:</strong> {{ $order->user->name }}</p>
-    <p><strong>Address:</strong> {{ $order->address }}</p>
-    <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
-    <p><strong>Date:</strong> {{ $order->created_at->format('d M Y, H:i') }}</p>
-
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <!-- Product List -->
+    <table>
         <thead>
             <tr>
-                <th style="border:1px solid #333; padding:8px;">Product</th>
-                <th style="border:1px solid #333; padding:8px;">Qty</th>
-                <th style="border:1px solid #333; padding:8px;">Price</th>
-                <th style="border:1px solid #333; padding:8px;">Subtotal</th>
+                <th>Product</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Price</th>
+                <th style="text-align:right;">Subtotal</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($order->products as $product)
+            @foreach($order->items as $item)
                 <tr>
-                    <td style="border:1px solid #333; padding:8px;">{{ $product->name }}</td>
-                    <td style="border:1px solid #333; padding:8px;">{{ $product->pivot->quantity }}</td>
-                    <td style="border:1px solid #333; padding:8px;">
-                        Rp {{ number_format($product->pivot->price, 0, ',', '.') }}
-                    </td>
-                    <td style="border:1px solid #333; padding:8px;">
-                        Rp {{ number_format($product->pivot->price * $product->pivot->quantity, 0, ',', '.') }}
-                    </td>
+                    <td>{{ $item->product->name }}</td>
+                    <td style="text-align:center;">{{ $item->quantity }}</td>
+                    <td style="text-align:right;">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+                    <td style="text-align:right;">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="3" style="text-align:right; border:1px solid #333; padding:8px;">Total</th>
-                <th style="border:1px solid #333; padding:8px;">
-                    Rp {{ number_format($order->total, 0, ',', '.') }}
-                </th>
+                <td colspan="3" class="total">Total</td>
+                <td style="text-align:right;">Rp {{ number_format($order->total, 0, ',', '.') }}</td>
             </tr>
         </tfoot>
     </table>
-@endsection
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Thank you for shopping with us! 🩺</p>
+    </div>
+</body>
+</html>

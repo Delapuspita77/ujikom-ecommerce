@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -12,6 +13,33 @@ class UserController extends Controller
     {
         $users = User::all();
         return view('admin.users.index', compact('users'));
+    }
+    
+    // 🔹 Form tambah user
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    // 🔹 Simpan user baru
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|string|min:6|confirmed', // pakai password_confirmation
+            'role'     => 'required|string|in:user,admin',
+        ]);
+
+        User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password), // hash password
+            'role'     => $request->role,
+        ]);
+
+        return redirect()->route('admin.users.index')
+                         ->with('success', 'User created successfully!');
     }
 
     public function edit(User $user)

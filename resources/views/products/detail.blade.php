@@ -1,24 +1,90 @@
 @extends('layouts.app')
 
-@section('title', $product->name . ' - Ecommerce Healthcare')
+@section('title', $product->name . ' - My Pharmacy')
 
 @section('content')
-    <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
-        <div style="flex: 1 1 300px; max-width: 400px;">
-            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="width: 100%; height: 200px; object-fit: cover;">
-        </div>
-        <div style="flex: 2 1 400px;">
-            <h1 style="font-weight: 700; font-size: 2rem; margin-bottom: 1rem;">{{ $product->name }}</h1>
-            <p style="font-size: 1rem; color: #555; margin-bottom: 1rem;">{{ $product->description }}</p>
-            <div style="font-size: 1.5rem; font-weight: 700; color: #007bff; margin-bottom: 1.5rem;">
-                Rp{{ number_format($product->price, 0, ',', '.') }}
-            </div>
-            <form action="{{ route('cart.add', $product->id) }}" method="POST" style="max-width: 200px;">
-                @csrf
-                <button type="submit" style="width: 100%; background: #007bff; border: none; color: white; padding: 0.75rem; border-radius: 6px; font-weight: 700; cursor: pointer;">
-                    Add to Cart
-                </button>
-            </form>
-        </div>
+<div class="max-w-5xl mx-auto bg-white rounded-xl shadow p-8 flex flex-col md:flex-row gap-8">
+    <!-- Gambar Produk -->
+    <div class="flex-1 max-w-sm mx-auto md:mx-0">
+        <img src="{{ asset('storage/' . $product->image) }}" 
+             alt="{{ $product->name }}" 
+             class="w-full h-72 object-cover rounded-lg shadow-sm">
     </div>
+
+    <!-- Detail Produk -->
+    <div class="flex-1">
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ $product->name }}</h1>
+        <p class="text-gray-600 mb-4">{{ $product->description }}</p>
+        <div class="text-2xl font-bold text-green-600 mb-6">
+            Rp {{ number_format($product->price, 0, ',', '.') }}
+        </div>
+
+        <!-- Tombol Add to Cart -->
+        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="max-w-xs">
+            @csrf
+            <button type="submit" 
+                    class="w-full rounded-md bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm 
+                           hover:bg-teal-500 hover:shadow-md transition duration-300 ease-in-out">
+                Add to Cart
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Feedback Section -->
+<div class="max-w-5xl mx-auto mt-10 bg-white rounded-xl shadow p-8">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Customer Feedback</h2>
+
+    <!-- Form Feedback -->
+    @auth
+        <form action="{{ route('feedbacks.store') }}" method="POST" class="space-y-4 mb-8">
+            @csrf
+            <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+            <div>
+                <label for="rating" class="block text-sm font-medium text-gray-700">Rating</label>
+                <select name="rating" id="rating" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                    <option value="5">⭐ 5 - Excellent</option>
+                    <option value="4">⭐ 4 - Good</option>
+                    <option value="3">⭐ 3 - Average</option>
+                    <option value="2">⭐ 2 - Poor</option>
+                    <option value="1">⭐ 1 - Bad</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="comment" class="block text-sm font-medium text-gray-700">Comment</label>
+                <textarea name="comment" id="comment" rows="3"
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                          placeholder="Tulis pengalamanmu..."></textarea>
+            </div>
+
+            <button type="submit"
+                    class="rounded-md bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 hover:shadow-md transition">
+                Submit Feedback
+            </button>
+        </form>
+    @else
+        <p class="text-sm text-gray-600 mb-6">
+            <a href="{{ route('login') }}" class="text-blue-600 underline">Login</a> untuk memberikan feedback.
+        </p>
+    @endauth
+
+    <!-- List Feedback -->
+    <div class="space-y-4">
+        @forelse($product->feedbacks as $feedback)
+            <div class="p-4 border rounded-lg bg-gray-50">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold text-gray-800">{{ $feedback->user->name }}</span>
+                    <span class="text-yellow-500">⭐ {{ $feedback->rating }}</span>
+                </div>
+                <p class="text-gray-700">{{ $feedback->comment }}</p>
+                <p class="text-xs text-gray-500 mt-1">Posted on {{ $feedback->created_at->format('d M Y') }}</p>
+            </div>
+        @empty
+            <p class="text-gray-500">Belum ada feedback untuk produk ini.</p>
+        @endforelse
+    </div>
+</div>
 @endsection

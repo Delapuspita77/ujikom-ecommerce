@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\FeedbackController;
 
 
 // Auth Controllers
@@ -37,7 +38,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrdersController::class, 'index'])->name('orders.index');
@@ -60,12 +63,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/{order}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{order}', [PaymentController::class, 'pay'])->name('payment.pay');
     Route::get('/invoice/{order_id}', [InvoiceController::class, 'show'])->name('invoice.show');
+
+    Route::post('/feedbacks', [FeedbackController::class, 'store'])
+    ->middleware('auth')
+    ->name('feedbacks.store');
 });
     Route::get('/orders/{id}/invoice', [InvoiceController::class, 'invoice'])
     ->name('orders.invoice');
 
+// Untuk admin
 Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('admin.users.store');
 
     Route::resource('/products', AdminProductController::class)->names('admin.products');
     Route::resource('/users', AdminUserController::class)->names('admin.users');
@@ -75,9 +86,5 @@ Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
 
     Route::post('/orders/{order}/accept', [AdminOrderController::class, 'accept'])->name('admin.orders.accept');
     Route::post('/orders/{order}/reject', [AdminOrderController::class, 'reject'])->name('admin.orders.reject');
-    Route::post('/admin/orders/{id}/ship', [AdminOrderController::class, 'ship'])->name('admin.orders.ship');
-
+    Route::post('/orders/{id}/ship', [AdminOrderController::class, 'ship'])->name('admin.orders.ship');
 });
-
-
-
