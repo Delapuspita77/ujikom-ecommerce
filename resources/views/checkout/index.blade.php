@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Checkout - Ecommerce Healthcare')
+@section('title', 'Checkout - My Pharmacy')
 
 @section('content')
     <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">Checkout</h1>

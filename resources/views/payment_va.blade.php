@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Bank Transfer Payment - Ecommerce Healthcare')
+@section('title', 'Bank Transfer Payment - My Pharmacy')
 
 @section('content')
     <h1 style="margin-bottom: 1.5rem; font-weight: 700; font-size: 2rem; color: #2c3e50;">

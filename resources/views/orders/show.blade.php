@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Order Detail - Ecommerce Healthcare')
+@section('title', 'Order Detail - My Pharmacy')
 
 @section('content')
     <h1 class="mb-6 text-2xl font-bold text-gray-800">Order Detail</h1>

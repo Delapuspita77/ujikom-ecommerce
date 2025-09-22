@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login - Ecommerce Healthcare')
+@section('title', 'Login - My Pharmacy')
 
 @section('content')
 <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md">
