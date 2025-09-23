@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Order;
+use App\Models\Feedbacks;
 
 class User extends Authenticatable
 {
@@ -47,8 +49,15 @@ class User extends Authenticatable
         ];
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function feedbacks()
     {
-        return $this->hasMany(\App\Models\Feedbacks::class);
+        return $this->hasMany(Feedbacks::class);
     }
+
+
 }

@@ -24,7 +24,7 @@
             @csrf
             <button type="submit" 
                     class="w-full rounded-md bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm 
-                           hover:bg-teal-500 hover:shadow-md transition duration-300 ease-in-out">
+                           hover:bg-teal-500 hover:shadow-md transition">
                 Add to Cart
             </button>
         </form>
@@ -33,46 +33,10 @@
 
 <!-- Feedback Section -->
 <div class="max-w-5xl mx-auto mt-10 bg-white rounded-xl shadow p-8">
-    <h2 class="text-xl font-bold text-gray-900 mb-4">Customer Feedback</h2>
-
-    <!-- Form Feedback -->
-    @auth
-        <form action="{{ route('feedbacks.store') }}" method="POST" class="space-y-4 mb-8">
-            @csrf
-            <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-            <div>
-                <label for="rating" class="block text-sm font-medium text-gray-700">Rating</label>
-                <select name="rating" id="rating" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
-                    <option value="5">⭐ 5 - Excellent</option>
-                    <option value="4">⭐ 4 - Good</option>
-                    <option value="3">⭐ 3 - Average</option>
-                    <option value="2">⭐ 2 - Poor</option>
-                    <option value="1">⭐ 1 - Bad</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="comment" class="block text-sm font-medium text-gray-700">Comment</label>
-                <textarea name="comment" id="comment" rows="3"
-                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
-                          placeholder="Tulis pengalamanmu..."></textarea>
-            </div>
-
-            <button type="submit"
-                    class="rounded-md bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-500 hover:shadow-md transition">
-                Submit Feedback
-            </button>
-        </form>
-    @else
-        <p class="text-sm text-gray-600 mb-6">
-            <a href="{{ route('login') }}" class="text-blue-600 underline">Login</a> untuk memberikan feedback.
-        </p>
-    @endauth
+    <h2 class="text-xl font-bold text-gray-900 mb-6">Customer Feedback</h2>
 
     <!-- List Feedback -->
-    <div class="space-y-4">
+    <div class="space-y-4 mb-8">
         @forelse($product->feedbacks as $feedback)
             <div class="p-4 border rounded-lg bg-gray-50">
                 <div class="flex justify-between items-center mb-2">
@@ -83,8 +47,19 @@
                 <p class="text-xs text-gray-500 mt-1">Posted on {{ $feedback->created_at->format('d M Y') }}</p>
             </div>
         @empty
-            <p class="text-gray-500">Belum ada feedback untuk produk ini.</p>
+            <p class="text-gray-500">There is no feedback for this product yet.</p>
         @endforelse
     </div>
+
+    <!-- Info untuk isi feedback -->
+    @auth
+        <p class="text-sm text-gray-600">
+            Feedback can only be provided after your order has shipped. Please check your order details to provide feedback.
+        </p>
+    @else
+        <p class="text-sm text-gray-600">
+            <a href="{{ route('login') }}" class="text-blue-600 underline">Login</a> untuk memberikan feedback.
+        </p>
+    @endauth
 </div>
 @endsection

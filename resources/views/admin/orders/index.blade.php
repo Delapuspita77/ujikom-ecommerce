@@ -7,7 +7,7 @@
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Orders</h1>
 
     <div class="overflow-x-auto">
-        <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
+        <table class="w-full border border-gray-200 rounded-lg overflow-hidden text-sm">
             <thead>
                 <tr class="bg-gray-50 text-left text-gray-700">
                     <th class="p-3 border">Order ID</th>
@@ -15,6 +15,7 @@
                     <th class="p-3 border">Total</th>
                     <th class="p-3 border">Order Status</th>
                     <th class="p-3 border">Payment Status</th>
+                    <th class="p-3 border">Payment Method</th>
                     <th class="p-3 border">Actions</th>
                 </tr>
             </thead>
@@ -27,50 +28,53 @@
                         Rp {{ number_format($order->total, 0, ',', '.') }}
                     </td>
                     <td class="p-3 border">
-                        <span class="px-2 py-1 text-sm rounded 
+                        <span class="px-2 py-1 text-xs rounded 
                             @if($order->status_order === 'pending') bg-yellow-100 text-yellow-700
                             @elseif($order->status_order === 'processed') bg-blue-100 text-blue-700
                             @elseif($order->status_order === 'shipped') bg-teal-100 text-teal-700
+                            @elseif($order->status_order === 'cancelled') bg-red-100 text-red-700
                             @else bg-gray-100 text-gray-600 @endif">
                             {{ ucfirst($order->status_order) }}
                         </span>
                     </td>
                     <td class="p-3 border">
-                        <span class="px-2 py-1 text-sm rounded 
+                        <span class="px-2 py-1 text-xs rounded 
                             @if($order->status === 'paid') bg-green-100 text-green-700
                             @elseif($order->status === 'unpaid') bg-red-100 text-red-700
+                            @elseif($order->status === 'waiting_verification') bg-yellow-100 text-yellow-700
                             @else bg-gray-100 text-gray-600 @endif">
-                            {{ ucfirst($order->status) }}
+                            {{ ucfirst(str_replace('_',' ', $order->status)) }}
                         </span>
                     </td>
+                    <td class="p-3 border">{{ $order->payment ? ucfirst($order->payment->method) : '-' }}</td>
                     <td class="p-3 border space-x-2">
-                        {{-- Jika status order "paid", admin bisa Accept / Reject --}}
-                        @if($order->status_order === 'paid')
+                        {{-- Admin bisa accept jika order paid (non-COD) atau COD --}}
+                        @if(($order->status_order === 'paid' && $order->payment->method !== 'cod') 
+                            || ($order->payment && $order->payment->method === 'cod' && $order->status_order === 'pending'))
                             <form action="{{ route('admin.orders.accept', $order->id) }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" 
-                                    class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600 transition">
+                                    class="bg-green-500 text-white px-3 py-1 rounded-md text-xs hover:bg-green-600 transition">
                                     Accept
                                 </button>
                             </form>
                             <form action="{{ route('admin.orders.reject', $order->id) }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" 
-                                    class="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition">
+                                    class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 transition">
                                     Reject
                                 </button>
                             </form>
                         @elseif($order->status_order === 'processed')
-                            {{-- Jika sudah diterima admin, tampilkan tombol Ship --}}
                             <form action="{{ route('admin.orders.ship', $order->id) }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" 
-                                    class="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition">
+                                    class="bg-blue-500 text-white px-3 py-1 rounded-md text-xs hover:bg-blue-600 transition">
                                     Ship
                                 </button>
                             </form>
                         @else
-                            <span class="text-gray-500 text-sm italic">No actions</span>
+                            <span class="text-gray-500 text-xs italic">No actions</span>
                         @endif
                     </td>
                 </tr>

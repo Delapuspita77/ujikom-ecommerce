@@ -26,7 +26,16 @@ class OrderController extends Controller
 
     public function accept($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with('payment')->findOrFail($id);
+
+        if ($order->payment && $order->payment->method === 'cod') {
+            // Untuk COD, admin bisa accept meskipun belum paid
+            $order->update([
+                'status_order' => 'processed',
+                'status'       => 'unpaid', // pakai enum yang sudah ada
+            ]);
+            return back()->with('success', 'COD order accepted. Waiting for delivery.');
+        }
 
         if ($order->status_order === 'paid') {
             $order->update([
@@ -36,8 +45,9 @@ class OrderController extends Controller
             return back()->with('success', 'Order accepted and payment verified.');
         }
 
-        return back()->with('error', 'Only paid orders can be accepted.');
+        return back()->with('error', 'Only paid or COD orders can be accepted.');
     }
+
 
     public function reject($id)
     {
@@ -66,5 +76,4 @@ class OrderController extends Controller
 
         return redirect()->route('admin.orders.index')->with('success', 'Order has been shipped!');
     }
-
 }

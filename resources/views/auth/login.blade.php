@@ -35,7 +35,7 @@
 
     <!-- Register link -->
     <p class="mt-6 text-center text-sm text-gray-600">
-        Belum punya akun? 
+        Don't have an account yet?
         <a href="{{ route('register') }}" class="text-amber-600 font-semibold hover:text-amber-500 transition">
             Register
         </a>

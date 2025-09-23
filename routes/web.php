@@ -9,6 +9,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\ProfileController;
 
 
 // Auth Controllers
@@ -39,13 +40,17 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register', [RegisterController::class, 'register']);
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrdersController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [OrdersController::class, 'show'])->name('orders.show');
     Route::post('/orders/{id}/confirm', [OrdersController::class, 'confirm'])->name('orders.confirm');
+
+    Route::post('/orders/{order}/confirm-payment', [OrderController::class, 'confirmPayment'])
+    ->name('orders.confirmPayment');
+
 });
 Route::post('/orders/{id}/cancel', [OrdersController::class, 'cancel'])->name('orders.cancel');
 
@@ -64,9 +69,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/payment/{order}', [PaymentController::class, 'pay'])->name('payment.pay');
     Route::get('/invoice/{order_id}', [InvoiceController::class, 'show'])->name('invoice.show');
 
-    Route::post('/feedbacks', [FeedbackController::class, 'store'])
-    ->middleware('auth')
-    ->name('feedbacks.store');
+    Route::post('/orders/{id}/send-invoice', [InvoiceController::class, 'sendInvoice'])->name('orders.sendInvoice');
+
+    Route::post('/feedbacks', [FeedbackController::class, 'store'])->middleware('auth')->name('feedbacks.store');
+    Route::post('/products/{product}/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 });
     Route::get('/orders/{id}/invoice', [InvoiceController::class, 'invoice'])
     ->name('orders.invoice');
@@ -83,6 +89,8 @@ Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
     Route::resource('/orders', AdminOrderController::class)->names('admin.orders');
     Route::resource('/categories', AdminCategoryController::class)->names('admin.categories');
     Route::resource('/feedbacks', AdminFeedbackController::class)->names('admin.feedbacks');
+
+    Route::post('/orders/{id}/send-invoice', [InvoiceController::class, 'sendInvoice'])->name('admin.orders.sendInvoice');
 
     Route::post('/orders/{order}/accept', [AdminOrderController::class, 'accept'])->name('admin.orders.accept');
     Route::post('/orders/{order}/reject', [AdminOrderController::class, 'reject'])->name('admin.orders.reject');

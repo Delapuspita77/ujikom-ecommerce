@@ -29,46 +29,65 @@
                 <tbody class="divide-y divide-gray-200">
                     @foreach($orders as $order)
                         <tr class="hover:bg-gray-50 transition">
-                            <td class="p-3">#{{ $order->id }}</td>
+                            <td class="p-3 font-medium text-gray-800">#{{ $order->id }}</td>
                             <td class="p-3 font-semibold text-teal-600">
                                 Rp {{ number_format($order->total, 0, ',', '.') }}
                             </td>
                             <td class="p-3">
                                 <span class="px-2 py-1 rounded text-xs font-medium 
-                                    {{ $order->status_order === 'pending' ? 'bg-yellow-100 text-yellow-700' : 
-                                       ($order->status_order === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700') }}">
+                                    @if($order->status_order === 'pending') bg-yellow-100 text-yellow-700
+                                    @elseif($order->status_order === 'processed') bg-blue-100 text-blue-700
+                                    @elseif($order->status_order === 'shipped') bg-teal-100 text-teal-700
+                                    @elseif($order->status_order === 'cancelled') bg-red-100 text-red-700
+                                    @else bg-green-100 text-green-700 @endif">
                                     {{ ucfirst($order->status_order) }}
                                 </span>
                             </td>
                             <td class="p-3">{{ ucfirst(str_replace('_',' ', $order->status)) }}</td>
-                            <td class="p-3">{{ $order->payment ? ucfirst(str_replace('_',' ', $order->payment->method)) : '-' }}</td>
+                            <td class="p-3">{{ $order->payment ? ucfirst($order->payment->method) : '-' }}</td>
                             <td class="p-3 text-center space-x-2">
-                                {{-- Cancel & Confirm kalau pending --}}
+                                {{-- Cancel selalu ada jika pending (semua metode pembayaran) --}}
                                 @if($order->status_order === 'pending')
                                     <form action="{{ route('orders.cancel', $order->id) }}" method="POST" 
-                                          onsubmit="return confirm('Cancel this order?')" class="inline">
+                                        onsubmit="return confirm('Cancel this order?')" class="inline">
                                         @csrf
                                         <button type="submit" 
                                             class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
                                             Cancel
                                         </button>
                                     </form>
+                                @endif
 
+                                {{-- Confirm Payment --}}
+                                @if($order->status_order === 'pending' && $order->payment && $order->payment->method !== 'cod')
+                                    {{-- Non-COD: confirm saat pending --}}
                                     <form action="{{ route('orders.confirm', $order->id) }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" 
                                             class="bg-teal-600 hover:bg-teal-500 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
-                                            Confirm
+                                            Confirm Payment
                                         </button>
                                     </form>
                                 @endif
 
+                                <!-- @if($order->payment && $order->payment->method === 'cod' && $order->status_order === 'shipped')
+                                    {{-- COD: confirm setelah shipped --}}
+                                    <form action="{{ route('orders.confirm', $order->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                            class="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
+                                            Confirm COD Payment
+                                        </button>
+                                    </form>
+                                @endif -->
+
                                 {{-- View selalu ada --}}
                                 <a href="{{ route('orders.show', $order->id) }}" 
-                                   class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
+                                class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-md text-xs font-semibold transition">
                                     View
                                 </a>
                             </td>
+
                         </tr>
                     @endforeach
                 </tbody>

@@ -4,26 +4,38 @@ namespace App\Http\Controllers;
 
 use App\Models\Feedbacks;
 use Illuminate\Http\Request;
+use App\Models\Product;
 
 class FeedbackController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, Product $product)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'rating'     => 'required|integer|min:1|max:5',
-            'comment'    => 'nullable|string|max:1000',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:500',
         ]);
 
-        Feedbacks::create([
-            'user_id'    => auth()->id(),
-            'product_id' => $request->product_id,
+        $user = auth()->user();
+
+        // Cek apakah user punya order shipped untuk produk ini
+        $hasShippedOrder = $user->orders()
+            ->where('status_order', 'shipped')
+            ->whereHas('items', function ($q) use ($product) {
+                $q->where('product_id', $product->id);
+            })
+            ->exists();
+
+        if (! $hasShippedOrder) {
+            return back()->with('error', 'Anda hanya bisa memberikan feedback jika sudah membeli dan order Anda shipped.');
+        }
+
+        // Simpan feedback
+        $user->feedbacks()->create([
+            'product_id' => $product->id,
             'rating'     => $request->rating,
             'comment'    => $request->comment,
         ]);
 
-        return redirect()
-            ->back()
-            ->with('success', 'Feedback submitted successfully!');
+        return back()->with('success', 'Feedback berhasil dikirim.');
     }
 }

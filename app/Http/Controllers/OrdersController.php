@@ -43,17 +43,26 @@ class OrdersController extends Controller
     {
         $order = Order::where('user_id', auth()->id())->findOrFail($id);
 
-        if ($order->status_order === 'pending') {
-            $order->update([
-                'status_order' => 'paid',
-                'status'       => 'waiting_verification',
-            ]);
-            return redirect()->route('orders.index')->with('success', 'Payment confirmation submitted. Waiting for admin verification.');
+        // Jika bukan COD, logika lama (pending -> paid)
+        if ($order->payment && $order->payment->method !== 'cod') {
+            if ($order->status_order === 'pending') {
+                $order->update([
+                    'status_order' => 'paid',
+                    'status'       => 'waiting_verification',
+                ]);
+                return redirect()->route('orders.index')->with('success', 'Payment confirmation submitted. Waiting for admin verification.');
+            }
+            return back()->with('error', 'This order cannot be confirmed.');
         }
 
-        return back()->with('error', 'This order cannot be confirmed.');
+        // Jika COD, hanya bisa confirm setelah status shipped
+        if ($order->payment && $order->payment->method === 'cod' && $order->status_order === 'shipped') {
+            $order->update([
+                'status' => 'paid', // langsung dianggap sudah dibayar
+            ]);
+            return redirect()->route('orders.index')->with('success', 'COD payment confirmed successfully.');
+        }
+
+        return back()->with('error', 'This COD order cannot be confirmed until shipped.');
     }
-
-
-
 }
